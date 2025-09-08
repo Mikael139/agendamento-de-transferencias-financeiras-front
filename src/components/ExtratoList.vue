@@ -29,40 +29,34 @@
   </div>
 </template>
 
-<script>
-import axios from 'axios';
-import { ref, onMounted } from 'vue';
+<script setup>
+import { ref, onMounted, defineExpose } from "vue";
+import axios from "axios";
 
-export default {
-  setup() {
-    const extrato = ref([]);
-    const loading = ref(true);
+const extrato = ref([]);
+const loading = ref(true);
 
-    const fetchExtrato = async () => {
-      loading.value = true;
-      try {
-        const response = await axios.get('http://localhost:8080/api/transferencias/extrato');
-        extrato.value = response.data;
-      } catch (error) {
-        console.error('Erro ao buscar o extrato:', error);
-      } finally {
-        loading.value = false;
-      }
-    };
-
-    const formatarData = (data) => {
-      const d = new Date(data);
-      const dia = String(d.getDate()).padStart(2, '0');
-      const mes = String(d.getMonth() + 1).padStart(2, '0');
-      const ano = d.getFullYear();
-      return `${dia}/${mes}/${ano}`;
-    };
-
-    onMounted(fetchExtrato);
-
-    return { extrato, loading, formatarData };
-  },
+const fetchExtrato = async () => {
+  loading.value = true;
+  try {
+    const response = await axios.get("http://localhost:8080/api/transferencias/extrato");
+    extrato.value = response.data;
+  } catch (error) {
+    console.error("Erro ao buscar o extrato:", error);
+  } finally {
+    loading.value = false;
+  }
 };
+
+const formatarData = (data) => {
+  if (!data) return "";
+  const [ano, mes, dia] = data.split("-");
+  return `${dia}/${mes}/${ano}`;
+};
+
+defineExpose({ fetchExtrato });
+
+onMounted(fetchExtrato);
 </script>
 
 <style scoped>
@@ -71,7 +65,8 @@ export default {
   border-collapse: collapse;
   margin-top: 20px;
 }
-.extrato-table th, .extrato-table td {
+.extrato-table th,
+.extrato-table td {
   border: 1px solid #ddd;
   padding: 12px;
   text-align: left;

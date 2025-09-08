@@ -2,19 +2,48 @@
   <form @submit.prevent="agendar">
     <div class="form-group">
       <label for="contaOrigem">Conta de Origem</label>
-      <input id="contaOrigem" v-model="form.contaOrigem" placeholder="Ex: XXXXXXXXXX" required />
+      <input
+        id="contaOrigem"
+        v-model="form.contaOrigem"
+        @input="form.contaOrigem = mascaraConta(form.contaOrigem)"
+        placeholder="Ex: 12345-6"
+        maxlength="7"
+        required
+      />
     </div>
+
     <div class="form-group">
       <label for="contaDestino">Conta de Destino</label>
-      <input id="contaDestino" v-model="form.contaDestino" placeholder="Ex: XXXXXXXXXX" required />
+      <input
+        id="contaDestino"
+        v-model="form.contaDestino"
+        @input="form.contaDestino = mascaraConta(form.contaDestino)"
+        placeholder="Ex: 65432-1"
+        maxlength="7"
+        required
+      />
     </div>
+
     <div class="form-group">
       <label for="valor">Valor (R$)</label>
-      <input id="valor" type="number" v-model.number="form.valor" placeholder="Ex: 1000.00" step="0.01" required />
+      <input
+        id="valor"
+        type="number"
+        v-model.number="form.valor"
+        placeholder="Ex: 1000.00"
+        step="0.01"
+        required
+      />
     </div>
+
     <div class="form-group">
       <label for="dataTransferencia">Data da Transferência</label>
-      <input id="dataTransferencia" type="date" v-model="form.dataTransferencia" required />
+      <input
+        id="dataTransferencia"
+        type="date"
+        v-model="form.dataTransferencia"
+        required
+      />
     </div>
 
     <button type="submit">Agendar</button>
@@ -24,41 +53,57 @@
   </form>
 </template>
 
-<script>
-import axios from 'axios';
-import { ref } from 'vue';
+<script setup>
+import { ref, defineEmits } from "vue";
+import axios from "axios";
 
-export default {
-  setup() {
-    const form = ref({
-      contaOrigem: '',
-      contaDestino: '',
+const emit = defineEmits(["atualizarExtrato"]);
+
+const form = ref({
+  contaOrigem: "",
+  contaDestino: "",
+  valor: 0,
+  dataTransferencia: "",
+  dataAgendamento: new Date().toISOString().slice(0, 10)
+});
+
+const successMessage = ref("");
+const errorMessage = ref("");
+
+const mascaraConta = (valor) => {
+  return valor
+    .replace(/\D/g, "")
+    .slice(0, 6)
+    .replace(/(\d{5})(\d{1})/, "$1-$2");
+};
+
+const agendar = async () => {
+  successMessage.value = "";
+  errorMessage.value = "";
+
+  try {
+    const response = await axios.post(
+      "http://localhost:8080/api/transferencias/agendar",
+      form.value
+    );
+    successMessage.value = `Transferência agendada com sucesso! ID: ${response.data.id}`;
+
+    emit("atualizarExtrato");
+
+    form.value = {
+      contaOrigem: "",
+      contaDestino: "",
       valor: 0,
-      dataTransferencia: '',
-      dataAgendamento: new Date().toISOString().slice(0, 10),
-    });
-
-    const successMessage = ref('');
-    const errorMessage = ref('');
-
-    const agendar = async () => {
-      successMessage.value = '';
-      errorMessage.value = '';
-
-      try {
-        const response = await axios.post('http://localhost:8080/api/transferencias/agendar', form.value);
-        successMessage.value = `Transferência agendada com sucesso! ID: ${response.data.id}`;
-      } catch (error) {
-        if (error.response) {
-          errorMessage.value = 'Transferência não permitida! Não há taxa aplicável para a data de transferência fornecida. ' + error.response.data;
-        } else {
-          errorMessage.value = 'Erro de rede: ' + error.message;
-        }
-      }
+      dataTransferencia: "",
+      dataAgendamento: new Date().toISOString().slice(0, 10)
     };
-
-    return { form, agendar, successMessage, errorMessage };
-  },
+  } catch (error) {
+    if (error.response) {
+      errorMessage.value = "Transferência não permitida! " + error.response.data;
+    } else {
+      errorMessage.value = "Erro de rede: " + error.message;
+    }
+  }
 };
 </script>
 

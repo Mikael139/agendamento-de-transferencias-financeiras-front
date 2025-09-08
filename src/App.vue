@@ -5,32 +5,32 @@
 
       <div class="card">
         <h2>Agendar Nova Transferência</h2>
-        <AgendamentoForm />
+        <AgendamentoForm @atualizarExtrato="atualizarExtrato" />
       </div>
 
       <div class="card">
         <h2>Extrato de Agendamentos</h2>
-        <ExtratoList />
+        <ExtratoList ref="extratoRef" />
       </div>
     </div>
   </div>
 </template>
 
-<script>
-import AgendamentoForm from './components/AgendamentoForm.vue';
-import ExtratoList from './components/ExtratoList.vue';
+<script setup>
+import { ref } from "vue";
+import AgendamentoForm from "./components/AgendamentoForm.vue";
+import ExtratoList from "./components/ExtratoList.vue";
 
-export default {
-  name: 'App',
-  components: {
-    AgendamentoForm,
-    ExtratoList
+const extratoRef = ref(null);
+
+const atualizarExtrato = () => {
+  if (extratoRef.value) {
+    extratoRef.value.fetchExtrato();
   }
 };
 </script>
 
 <style>
-/* Estilos globais */
 body {
   font-family: Arial, sans-serif;
   background-color: #f0f2f5;
