@@ -1,7 +1,7 @@
 # Agendamento de Transferências - Front-end
 Este projeto é a interface de usuário (front-end) para o sistema de agendamento de transferências financeiras. Desenvolvido com Vue.js, ele permite que você interaja com a API REST de forma intuitiva, agendando novas transferências e visualizando o extrato de todas as operações.
 
-O projeto foi criado para ser leve e eficiente, consumindo os endpoints da API de back-end e fornecendo uma experiência de usuário simples.
+O projeto foi criado para ser leve e eficiente, consumindo os endpoints da API back-end e fornecendo uma experiência de usuário simples.
 
 # Tecnologias Utilizadas
 - Vue.js: Framework JavaScript progressivo para a construção de interfaces de usuário. A arquitetura baseada em componentes permite uma organização clara e modular do código.
